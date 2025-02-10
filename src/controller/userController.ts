@@ -164,7 +164,7 @@ export const ForgotPassword = async (req: Request, res: Response) => {
     }
 }
 export const ResetPassword = async (req: Request, res: Response) => {
-    const token = req.params
+    const {token} = req.params
     if (!token) {
         res.status(400).json({
             message: "no token found"
@@ -172,7 +172,9 @@ export const ResetPassword = async (req: Request, res: Response) => {
     }
     try {
         const isValid = await prisma.user.findUnique({
-            where: {email},
+            where: {
+                resetToken:token
+            }
         })
         if (!isValid) {
             res.status(400).send(
@@ -180,7 +182,7 @@ export const ResetPassword = async (req: Request, res: Response) => {
             )
             return
         }
-        res.send(`'<form method="post" action="/reset-password"><input type="password" name="password" required><input type="submit" value="Reset Password"></form>'`)
+        res.send(`'<form method="post" action="/api/v1/reset-password"><input type="hidden" name="token" value=${token} /><input type="password" name="password" required><input type="submit" value="Reset Password"></form>'`)
     } catch (error) {
         console.log("error", error);
         res.status(500).json({
@@ -192,6 +194,22 @@ export const ResetPassword = async (req: Request, res: Response) => {
 
 export const UpdatePassord = async (req: Request, res: Response) => {
     const { token, password } = req.body;
+
+    if (!token) {
+         res.status(400).json({
+            message: "No token provided"
+        });
+        return
+    }
+
+    if (!password) {
+         res.status(400).json({
+            message: "No password provided"
+        });
+        return
+    }
+    console.log("token",token);
+    // console.log("password",password);
     try {
         const theuser = await prisma.user.findFirst({
             where: {
@@ -204,12 +222,14 @@ export const UpdatePassord = async (req: Request, res: Response) => {
             })
             return
         }
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
         const updatePass = await prisma.user.update({
             where: {
                 email: theuser.email
             },
             data: {
-                password: password
+                password: hashedPassword,
+                resetToken:null
             }
         })
         if (!updatePass) {
