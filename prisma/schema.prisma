@@ -41,7 +41,7 @@ model Blog {
 model Category {
   id             Int              @id @default(autoincrement())
   userId         Int
-  name           String
+  name           String           @unique
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @default(now())
   blogs          Blog[]           @relation("BlogCategories") // Add inverse relation

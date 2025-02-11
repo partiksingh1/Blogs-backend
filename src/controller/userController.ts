@@ -164,7 +164,7 @@ export const ForgotPassword = async (req: Request, res: Response) => {
     }
 }
 export const ResetPassword = async (req: Request, res: Response) => {
-    const {token} = req.params
+    const { token } = req.params
     if (!token) {
         res.status(400).json({
             message: "no token found"
@@ -173,7 +173,7 @@ export const ResetPassword = async (req: Request, res: Response) => {
     try {
         const isValid = await prisma.user.findUnique({
             where: {
-                resetToken:token
+                resetToken: token
             }
         })
         if (!isValid) {
@@ -196,19 +196,19 @@ export const UpdatePassord = async (req: Request, res: Response) => {
     const { token, password } = req.body;
 
     if (!token) {
-         res.status(400).json({
+        res.status(400).json({
             message: "No token provided"
         });
         return
     }
 
     if (!password) {
-         res.status(400).json({
+        res.status(400).json({
             message: "No password provided"
         });
         return
     }
-    console.log("token",token);
+    console.log("token", token);
     // console.log("password",password);
     try {
         const theuser = await prisma.user.findFirst({
@@ -229,7 +229,7 @@ export const UpdatePassord = async (req: Request, res: Response) => {
             },
             data: {
                 password: hashedPassword,
-                resetToken:null
+                resetToken: null
             }
         })
         if (!updatePass) {
