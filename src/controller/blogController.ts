@@ -136,9 +136,9 @@ export const GetBlogs = async (req: Request, res: Response) => {
             where: {
                 userId: userId
             },
-            include:{
-                categories:true,
-                tags:true
+            include: {
+                categories: true,
+                tags: true
             }
         })
         if (!blogs) {
@@ -250,8 +250,8 @@ export const DeleteBlogById = async (req: Request, res: Response) => {
         })
     }
 }
-export const JoinTags = async (req: Request, res: Response) =>{
-    const {blogId,userId,tagName} = req.body
+export const JoinTags = async (req: Request, res: Response) => {
+    const { blogId, userId, tagName } = req.body
     if (!userId && !tagName) {
         res.status(400).json({
             message: "Provide user and tag name"
@@ -259,25 +259,25 @@ export const JoinTags = async (req: Request, res: Response) =>{
     }
     try {
         const tag = await prisma.tag.upsert({
-            where:{
-               userId_name:{
-                  userId:userId,
-                   name:tagName
-               },
+            where: {
+                userId_name: {
+                    userId: userId,
+                    name: tagName
+                },
             },
-               update:{},
-               create:{
-                name:tagName,
-                userId:userId
-               }
+            update: {},
+            create: {
+                name: tagName,
+                userId: userId
+            }
         })
 
         const blog = await prisma.blog.update({
-            where:{ id: blogId},
-            data:{
-                tags:{
-                    connect:{
-                        id:tag.id
+            where: { id: blogId },
+            data: {
+                tags: {
+                    connect: {
+                        id: tag.id
                     }
                 }
             }
@@ -286,11 +286,11 @@ export const JoinTags = async (req: Request, res: Response) =>{
             message: "Tag added successfully to the blog",
             blog,
             tag
-          });
+        });
     } catch (error) {
         console.error(error);
-    res.status(500).json({
-      message: "Internal server error while adding tag to blog."
-    });
+        res.status(500).json({
+            message: "Internal server error while adding tag to blog."
+        });
     }
 }
